@@ -1,0 +1,7 @@
+{
+  "name": "challengeIonic",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
