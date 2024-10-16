@@ -16,11 +16,7 @@
 
   <div *ngIf="selectedCategory === 'Personajes'">
     <div *ngFor="let character of characters">
-      <!--app-character-card 
-        [name]="character.name" 
-        [status]="character.status" 
-        [imageUrl]="character.image">
-      </app-character-card-->
+      <app-character-card [character]="character"></app-character-card>
     </div>
   </div>
 
@@ -45,4 +41,15 @@
       </ion-card>
     </div>
   </div>
+
+
+  <ion-infinite-scroll
+    threshold="100px"
+    [disabled]="!moreData"  
+    (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Cargando más datos...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 </ion-content>

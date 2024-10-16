@@ -25,7 +25,7 @@ export class FilterComponent  implements OnInit {
   //filtro por categoria
   onCategoryChange(event: any) {
     this.selectedCategory = event.detail.value;
-    this.applyFilters(); 
+    this.applyFilters();
   }
 
   //filtro por fecha seleccionada
@@ -42,7 +42,7 @@ export class FilterComponent  implements OnInit {
   applyFilters() {
     this.filterChange.emit({
       category: this.selectedCategory,
-      selectedDate: this.selectedDate,
+      date: this.selectedDate,
       searchQuery: this.searchQuery,
     });
   }

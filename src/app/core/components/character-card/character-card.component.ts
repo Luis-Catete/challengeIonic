@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
+import { Character } from '../../interfaces/character';
 
 @Component({
   selector: 'app-character-card',
@@ -10,6 +11,9 @@ import { IonicModule } from '@ionic/angular';
   imports:[CommonModule,IonicModule],
 })
 export class CharacterCardComponent  implements OnInit {
+
+  @Input() character!: Character; // Recibir el objeto Character
+
 
   constructor() { }
 

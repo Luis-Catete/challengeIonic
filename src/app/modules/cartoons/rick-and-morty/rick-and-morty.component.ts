@@ -3,6 +3,8 @@ import { RickymortyService } from 'src/app/core/services/rickymorty.service';
 import { LoadingController, AlertController } from '@ionic/angular';
 import * as moment from 'moment';
 import { Episode } from 'src/app/core/interfaces/episode';
+import { Character } from 'src/app/core/interfaces/character';
+import { Location } from 'src/app/core/interfaces/location';
 
 @Component({
   selector: 'app-rick-and-morty',
@@ -12,12 +14,16 @@ import { Episode } from 'src/app/core/interfaces/episode';
 export class RickAndMortyComponent implements OnInit {
   categories: string[] = ['Personajes', 'Episodios', 'Locaciones'];
   selectedCategory = 'Locaciones';
-  characters: any[] = [];
-  episodes: any[] = [];
-  locations: any[] = [];
+  characters: Character[] = [];
+  episodes: Episode[] = [];
+  locations: Location[] = [];
   error: string = '';
-  selectedDate: string = '';
-  searchQuery: string = '';
+  selectedDate: string = '';//fecha para filtro
+  searchQuery: string = ''; //texto de busqueda para filtro
+  page: number = 1; // Para manejar la paginación
+  itemsPerPage: number = 10; // Número de ítems a cargar por vez
+  moreData: boolean = true; // Controla si hay más datos para cargar
+
 
   constructor(
     private rickyMortyEndPoint: RickymortyService,
@@ -34,14 +40,18 @@ export class RickAndMortyComponent implements OnInit {
     this.selectedCategory = filters.category;
     this.selectedDate = filters.date;
     this.searchQuery = filters.searchQuery;
+    this.page = 1; // Reiniciar la página al aplicar un nuevo filtro
     this.getData();
   }
 
   async getData() {
-    // Se Restablecen los resultados
-    this.characters = [];
-    this.episodes = [];
-    this.locations = [];
+    // Restablecer los resultados
+    if (this.page === 1) {
+      this.characters = [];
+      this.episodes = [];
+      this.locations = [];
+      this.moreData = true; // Reiniciar el control de datos
+    }
 
     // Restablecer el filtro de fecha si no estamos en la categoría de episodios
   if (this.selectedCategory !== 'Episodios') {
@@ -57,8 +67,12 @@ export class RickAndMortyComponent implements OnInit {
 
     switch (this.selectedCategory) {
       case 'Personajes':
-        this.rickyMortyEndPoint.getCharacters().subscribe({
+        this.rickyMortyEndPoint.getCharacters(this.page).subscribe({
           next: response => {
+
+            if (response.results.length < this.itemsPerPage) {
+              this.moreData = false; // No hay más datos
+            }
             let filteredCharacters = response.results;
 
             // Aplicar filtro de búsqueda si hay una palabra clave ingresada
@@ -66,7 +80,7 @@ export class RickAndMortyComponent implements OnInit {
             filteredCharacters = this.applySearchFilter(filteredCharacters, ['name', 'status']);
           }
 
-            this.characters = response.results;
+          this.characters = [...this.characters, ...filteredCharacters];
             loading.dismiss(); // Ocultar el diálogo de carga
           },
           error: async () => {
@@ -81,19 +95,21 @@ export class RickAndMortyComponent implements OnInit {
         break;
 
       case 'Episodios':
-        this.rickyMortyEndPoint.getEpisodes().subscribe({
+        this.rickyMortyEndPoint.getEpisodes(this.page).subscribe({
           next: response => {
+            if (response.results.length < this.itemsPerPage) {
+              this.moreData = false; // No hay más datos
+            }
             let filteredEpisodes = response.results;
 
-          // Aplicar el filtro de fecha para mostrar los episodios por fecha de emisión si estan disponibles
+          // Aplicar el filtro de fecha para mostrar los episodios por fecha de emisión si están disponibles
           if (this.selectedDate) {
-            const selectedDateMoment = moment(this.selectedDate);
+            const selectedDateMoment = moment(this.selectedDate); // Ajusta el formato según sea necesario
 
             filteredEpisodes = filteredEpisodes.filter((episode: Episode) => {
               const episodeAirDate = moment(episode.air_date, 'MMMM D, YYYY');
-              return episodeAirDate.isSame(selectedDateMoment, 'day'); //se 
+              return episodeAirDate.isSame(selectedDateMoment, 'day');
             });
-
           }
 
           // Aplicar filtro de búsqueda si hay una palabra clave ingresada
@@ -101,7 +117,7 @@ export class RickAndMortyComponent implements OnInit {
             filteredEpisodes = this.applySearchFilter(filteredEpisodes, ['name', 'episode']);
           }
 
-            this.episodes = filteredEpisodes;
+          this.episodes = [...this.episodes, ...filteredEpisodes];
             loading.dismiss();
           },
           error: async () => {
@@ -116,8 +132,11 @@ export class RickAndMortyComponent implements OnInit {
         break;
 
       case 'Locaciones':
-        this.rickyMortyEndPoint.getLocations().subscribe({
+        this.rickyMortyEndPoint.getLocations(this.page).subscribe({
           next: response => {
+            if (response.results.length < this.itemsPerPage) {
+              this.moreData = false; // No hay más datos
+            }
 
             let filteredLocations = response.results;
 
@@ -125,7 +144,7 @@ export class RickAndMortyComponent implements OnInit {
           if (this.searchQuery) {
             filteredLocations = this.applySearchFilter(filteredLocations, ['name', 'type']);
           }
-            this.locations = filteredLocations;
+          this.locations = [...this.locations, ...filteredLocations];
             loading.dismiss();
           },
           error: async () => {
@@ -145,6 +164,14 @@ export class RickAndMortyComponent implements OnInit {
     }
   }
 
+  // Metodo para cargar mas datos al hacer scroll infinito
+  loadData(event: any) {
+    this.page++; // Incrementar la página
+    this.getData().then(() => {
+      event.target.complete(); // Completar la acción de carga
+    });
+  }
+
   // Método para mostrar alerta de error
   async showErrorAlert(message: string) {
     const alert = await this.alertController.create({
@@ -153,21 +180,6 @@ export class RickAndMortyComponent implements OnInit {
       buttons: ['OK'],
     });
     await alert.present();
-  }
-
-  // Aplicar los filtros (búsqueda y fecha)
-  applyFilters(data: any[]) {
-    return data.filter(item => {
-      // Filtrar por búsqueda (searchQuery)
-      const matchesSearch = !this.searchQuery || 
-        item.name.toLowerCase().includes(this.searchQuery.toLowerCase());
-
-      // Filtrar por fecha (para episodios o locaciones si tienen fecha)
-      const matchesDate = !this.selectedDate || 
-        (item.air_date && item.air_date.includes(this.selectedDate));
-
-      return matchesSearch && matchesDate;
-    });
   }
 
   applySearchFilter(data: any[], properties: string[]): any[] {
@@ -191,6 +203,20 @@ export class RickAndMortyComponent implements OnInit {
         return false;
       });
     });
+  }
+
+  // Método para obtener la lista actual basada en la categoría seleccionada
+  getCurrentList() {
+    switch (this.selectedCategory) {
+      case 'Personajes':
+        return this.characters;
+      case 'Episodios':
+        return this.episodes;
+      case 'Locaciones':
+        return this.locations;
+      default:
+        return [];
+    }
   }
   
 }

@@ -12,8 +12,12 @@ export class RickymortyService {
   constructor(private http: HttpClient) { }
 
   //ruta para obtener los personajes
-  getCharacters() {
-    return this.http.get<any>(`${this.baseUrl}/character`,).pipe(
+  getCharacters(page: number,) {
+    return this.http.get<any>(`${this.baseUrl}/character`,{
+      params: {
+        page: page.toString(),
+      }
+    }).pipe(
       tap((res: any) => {
         console.log("respuesta de api create ",res);
       })
@@ -21,21 +25,30 @@ export class RickymortyService {
   }
 
   //ruta para obtener los episodios
-  getEpisodes() {
-    return this.http.get<any>(`${this.baseUrl}/episode`,).pipe(
+  getEpisodes(page: number,) {
+    return this.http.get<any>(`${this.baseUrl}/episode`,{
+      params: {
+        page: page.toString(),
+      }
+    }).pipe(
       tap((res: any) => {
         console.log("respuesta de api create ",res);
       })
     );
   }
 
-  //ruta para obtener las locaciones
-  getLocations() {
-    return this.http.get<any>(`${this.baseUrl}/location`,).pipe(
-      tap((res: any) => {
-        console.log("respuesta de api create ",res);
-      })
-    );
-  }
+  // Ruta para obtener las locaciones
+getLocations(page: number) {
+  return this.http.get<any>(`${this.baseUrl}/location`, {
+    params: {
+      page: page.toString(),
+    }
+  }).pipe(
+    tap((res: any) => {
+      console.log("respuesta de api getLocations", res);
+    })
+  );
+}
+
 
 }
