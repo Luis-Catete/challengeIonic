@@ -1,2 +1,22 @@
 // For information on how to create your own theme, please see:
 // http://ionicframework.com/docs/theming/
+// Colores personalizados
+:root {
+    --kiwi-green: #88e23b; /* Kiwi Green */
+    --texas: #ebe480; /* Texas */
+    --tardis-blue: #043c6e; /* Tardis Blue */
+    --endo: #60a85f; /* Endo */
+    --mystery: #a6cccc; /* Mystery */
+    --calla-green: #6b7132; /* Calla Green */
+  
+    // Colores adicionales
+    --ion-color-primary: var(--tardis-blue); /* Color primario */
+    --ion-color-secondary: var(--kiwi-green); /* Color secundario */
+    --ion-color-tertiary: var(--endo); /* Color terciario */
+    --ion-color-success: var(--kiwi-green); /* Color de éxito */
+    --ion-color-warning: var(--texas); /* Color de advertencia */
+    --ion-color-danger: var(--calla-green); /* Color de peligro */
+    --ion-color-light: var(--mystery); /* Color claro */
+    --ion-color-dark: var(--tardis-blue); /* Color oscuro */
+  }
+  

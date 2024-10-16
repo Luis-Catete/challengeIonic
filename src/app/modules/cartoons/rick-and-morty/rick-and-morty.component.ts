@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { RickymortyService } from 'src/app/core/services/rickymorty.service';
-import { LoadingController, AlertController } from '@ionic/angular';
+import { LoadingController, AlertController, ModalController } from '@ionic/angular';
 import * as moment from 'moment';
 import { Episode } from 'src/app/core/interfaces/episode';
 import { Character } from 'src/app/core/interfaces/character';
 import { Location } from 'src/app/core/interfaces/location';
+import { DetailCardComponent } from 'src/app/core/components/cards/detail-card/detail-card.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-rick-and-morty',
@@ -28,11 +30,19 @@ export class RickAndMortyComponent implements OnInit {
   constructor(
     private rickyMortyEndPoint: RickymortyService,
     private loadingController: LoadingController,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private modalCtrl: ModalController,
+    private activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit() {
-    this.getData();
+    // Leer el parámetro de consulta al iniciar si recibe algun parametro
+    this.activatedRoute.queryParams.subscribe(params => {
+      if (params['category']) {
+        this.selectedCategory = params['category']; // Asignar la categoría seleccionada
+      }
+      this.getData(); // Obtener datos según la categoría
+    });
   }
 
   // Método para recibir los filtros del componente hijo (app-filter)
@@ -52,125 +62,131 @@ export class RickAndMortyComponent implements OnInit {
       this.locations = [];
       this.moreData = true; // Reiniciar el control de datos
     }
-
+  
     // Restablecer el filtro de fecha si no estamos en la categoría de episodios
-  if (this.selectedCategory !== 'Episodios') {
-    this.selectedDate = ''; // Resetear la fecha si se cambia a otra categoría
-  }
-
+    if (this.selectedCategory !== 'Episodios') {
+      this.selectedDate = ''; // Resetear la fecha si se cambia a otra categoría
+    }
+  
     this.error = ''; // Resetear errores
     const loading = await this.loadingController.create({
       message: 'Cargando datos...',
       spinner: 'crescent',
     });
     await loading.present(); // Mostrar el diálogo de carga
-
+  
     switch (this.selectedCategory) {
       case 'Personajes':
         this.rickyMortyEndPoint.getCharacters(this.page).subscribe({
           next: response => {
-
             if (response.results.length < this.itemsPerPage) {
               this.moreData = false; // No hay más datos
             }
             let filteredCharacters = response.results;
-
+  
             // Aplicar filtro de búsqueda si hay una palabra clave ingresada
-          if (this.searchQuery) {
-            filteredCharacters = this.applySearchFilter(filteredCharacters, ['name', 'status']);
-          }
-
-          this.characters = [...this.characters, ...filteredCharacters];
-            loading.dismiss(); // Ocultar el diálogo de carga
+            if (this.searchQuery) {
+              filteredCharacters = this.applySearchFilter(filteredCharacters, ['name', 'status']);
+            }
+  
+            this.characters = [...this.characters, ...filteredCharacters];
           },
           error: async () => {
             this.error = 'Error al cargar personajes';
             await loading.dismiss(); // Asegurarse de ocultar el diálogo
             this.showErrorAlert('Error al cargar personajes'); // Mostrar alerta de error
           },
-          complete: () => {
+          complete: async () => {
             console.log('Petición de personajes completada');
+            await loading.dismiss(); // Mover aquí para asegurarse de que se cierra en complete
           }
         });
         break;
-
-      case 'Episodios':
-        this.rickyMortyEndPoint.getEpisodes(this.page).subscribe({
-          next: response => {
-            if (response.results.length < this.itemsPerPage) {
-              this.moreData = false; // No hay más datos
+  
+        case 'Episodios':
+          this.rickyMortyEndPoint.getEpisodes(this.page).subscribe({
+            next: response => {
+              // Establece `moreData` en `false` si no hay resultados
+              if (response.results.length < this.itemsPerPage) {
+                this.moreData = false; // No hay más datos
+              } else {
+                this.moreData = true; // Hay más datos disponibles
+              }
+        
+              let filteredEpisodes = response.results;
+        
+              // Lógica de filtro por fecha
+              if (this.selectedDate) {
+                // ... tu código de filtrado por fecha
+              }
+        
+              // Lógica de filtro de búsqueda
+              if (this.searchQuery) {
+                filteredEpisodes = this.applySearchFilter(filteredEpisodes, ['name', 'episode']);
+              }
+        
+              this.episodes = [...this.episodes, ...filteredEpisodes];
+            },
+            error: async () => {
+              this.error = 'Error al cargar episodios';
+              await loading.dismiss();
+              this.showErrorAlert('Error al cargar episodios');
+            },
+            complete: async () => {
+              console.log('Petición de episodios completada');
+              await loading.dismiss();
             }
-            let filteredEpisodes = response.results;
-
-          // Aplicar el filtro de fecha para mostrar los episodios por fecha de emisión si están disponibles
-          if (this.selectedDate) {
-            const selectedDateMoment = moment(this.selectedDate); // Ajusta el formato según sea necesario
-
-            filteredEpisodes = filteredEpisodes.filter((episode: Episode) => {
-              const episodeAirDate = moment(episode.air_date, 'MMMM D, YYYY');
-              return episodeAirDate.isSame(selectedDateMoment, 'day');
-            });
-          }
-
-          // Aplicar filtro de búsqueda si hay una palabra clave ingresada
-          if (this.searchQuery) {
-            filteredEpisodes = this.applySearchFilter(filteredEpisodes, ['name', 'episode']);
-          }
-
-          this.episodes = [...this.episodes, ...filteredEpisodes];
-            loading.dismiss();
-          },
-          error: async () => {
-            this.error = 'Error al cargar episodios';
-            await loading.dismiss();
-            this.showErrorAlert('Error al cargar episodios');
-          },
-          complete: () => {
-            console.log('Petición de episodios completada');
-          }
-        });
-        break;
-
+          });
+          break;
+        
       case 'Locaciones':
         this.rickyMortyEndPoint.getLocations(this.page).subscribe({
           next: response => {
             if (response.results.length < this.itemsPerPage) {
               this.moreData = false; // No hay más datos
             }
-
+  
             let filteredLocations = response.results;
-
-          // Aplicar filtro de búsqueda si hay una palabra clave ingresada
-          if (this.searchQuery) {
-            filteredLocations = this.applySearchFilter(filteredLocations, ['name', 'type']);
-          }
-          this.locations = [...this.locations, ...filteredLocations];
-            loading.dismiss();
+  
+            // Aplicar filtro de búsqueda si hay una palabra clave ingresada
+            if (this.searchQuery) {
+              filteredLocations = this.applySearchFilter(filteredLocations, ['name', 'type']);
+            }
+            this.locations = [...this.locations, ...filteredLocations];
           },
           error: async () => {
             this.error = 'Error al cargar locaciones';
             await loading.dismiss();
             this.showErrorAlert('Error al cargar locaciones');
           },
-          complete: () => {
+          complete: async () => {
             console.log('Petición de locaciones completada');
+            await loading.dismiss(); // Mover aquí para asegurarse de que se cierra en complete
           }
         });
         break;
-
+  
       default:
-        loading.dismiss(); // Ocultar el diálogo si no hay categoría seleccionada
+        await loading.dismiss(); // Ocultar el diálogo si no hay categoría seleccionada
         break;
     }
   }
+  
 
   // Metodo para cargar mas datos al hacer scroll infinito
   loadData(event: any) {
+    if (!this.moreData) {
+      event.target.complete(); // Completa la acción de carga si no hay más datos
+      console.log('No hay más episodios para cargar.'); // Log para depurar
+      return;
+    }
+  
     this.page++; // Incrementar la página
     this.getData().then(() => {
       event.target.complete(); // Completar la acción de carga
     });
   }
+  
 
   // Método para mostrar alerta de error
   async showErrorAlert(message: string) {
@@ -205,18 +221,14 @@ export class RickAndMortyComponent implements OnInit {
     });
   }
 
-  // Método para obtener la lista actual basada en la categoría seleccionada
-  getCurrentList() {
-    switch (this.selectedCategory) {
-      case 'Personajes':
-        return this.characters;
-      case 'Episodios':
-        return this.episodes;
-      case 'Locaciones':
-        return this.locations;
-      default:
-        return [];
-    }
+  //Despliega un dialogo para mostrar la información de la categoria seleccionada 
+  async infoItem(item:any) {
+    //Método para mandar la información del item seleccionado al componente
+    const modal = await this.modalCtrl.create({
+      component: DetailCardComponent,
+      componentProps: { infoItem: item,category:this.selectedCategory },
+    });
+    modal.present();
   }
   
 }

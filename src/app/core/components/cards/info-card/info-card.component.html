@@ -1,0 +1,20 @@
+<ion-card *ngIf="item">
+  <ion-card-header>
+    <!-- Mostrar el título según la categoría -->
+    <ion-card-title >{{ item.name }}</ion-card-title>
+    
+    <!-- Mostrar información adicional basada en la categoría -->
+    <ion-card-subtitle *ngIf="category === 'Episodios'">Aire: {{ item.air_date }}</ion-card-subtitle>
+    <ion-card-subtitle *ngIf="category === 'Personajes'">Estado: {{ item.status }}</ion-card-subtitle>
+    <ion-card-subtitle *ngIf="category === 'Locaciones'">Tipo: {{ item.type }}</ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content>
+    <!-- Mostrar la imagen si es un personaje -->
+    <ion-img *ngIf="category === 'Personajes'" [src]="item.image"></ion-img>
+
+    <!-- Contenido adicional para cada categoría -->
+    <p *ngIf="category === 'Personajes'">Especie: {{ item.species }}</p>
+    <p *ngIf="category === 'Locaciones'">Dimensión: {{ item.dimension }}</p>
+  </ion-card-content>
+</ion-card>

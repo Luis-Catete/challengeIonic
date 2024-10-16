@@ -1,3 +1,18 @@
-<p>
-  inicio works!
-</p>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Inicio</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" style="text-align: center;">
+  <h1 style="font-family: 'Comic Sans MS', cursive; color: var(--kiwi-green);">¡Bienvenido!</h1>
+  <p style="font-family: 'Comic Sans MS', cursive; color: var(--mystery);">
+    Explora el multiverso de Rick y Morty.
+  </p>
+  <ion-button color="secondary" expand="full"[routerLink]="['/cartoons']" [queryParams]="{ category: 'Personajes' }">
+    Ver Personajes
+  </ion-button>
+  <ion-button color="tertiary" expand="full"[routerLink]="['/cartoons']" [queryParams]="{ category: 'Episodios' }">
+    Ver Episodios
+  </ion-button>
+</ion-content>

@@ -1,0 +1,40 @@
+<ion-content >
+  <form [formGroup]="formRegister" (ngSubmit)="onSubmit()">
+    <ion-grid class="ion-align-items-center ion-justify-content-center" style="height: 100%;">
+      <ion-row class="ion-align-items-center" style="height: 100%;">
+        <ion-col size="12" size-md="8" size-lg="6">
+          <div class="ion-text-center img-container">
+            <ion-img src="../../../../assets/images/png/logo-nexion.png"></ion-img>
+          </div>
+          
+          <div class="ion-padding">
+            <ion-input 
+              label="Correo" 
+              formControlName="email" 
+              class="input-form" 
+              errorText="Correo Inválido" 
+              placeholder="Correo electrónico" 
+              fill="outline" 
+              label-placement="floating">
+            </ion-input>
+            <br>
+            <ion-input 
+              label="Contraseña" 
+              type="password" 
+              formControlName="password" 
+              class="input-form" 
+              errorText="La contraseña es obligatoria" 
+              placeholder="Contraseña" 
+              fill="outline" 
+              label-placement="floating">
+            </ion-input>
+          </div>
+
+          <div class="ion-padding">
+            <ion-button class="button-custom" expand="block" type="submit" size="large">REGISTRARSE</ion-button>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </form>
+</ion-content>

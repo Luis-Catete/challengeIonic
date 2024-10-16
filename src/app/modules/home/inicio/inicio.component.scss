@@ -1,0 +1,18 @@
+ion-content::part(background) {
+    background-image: url('../../../../assets/images/jpg/fondo.jpg');
+    background-size: cover; 
+    background-position: center; 
+  }
+  ion-content {
+    background-color: var(--tardis-blue);
+    color: var(--mystery);
+  }
+  
+  h1 {
+    margin-bottom: 20px;
+  }
+  
+  p {
+    margin-bottom: 40px;
+  }
+  

@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Perfil</ion-title>
+  </ion-toolbar>
+
+</ion-header>
+
+<ion-content >
+  <ion-list [inset]="true">
+    <ion-item [button]="true">
+      <ion-icon color="primary" slot="start" name="settings" size="large"></ion-icon>
+      <ion-label>Configuración</ion-label>
+      <ion-note slot="end">6</ion-note>
+    </ion-item>
+    <ion-item [button]="true" >
+      <ion-icon color="tertiary" slot="start" name="person" size="large"></ion-icon>
+      <ion-label>Mi Perfil</ion-label>
+      <ion-note slot="end">15</ion-note>
+    </ion-item>
+    <ion-item [button]="true" (click)="logout()">
+      <ion-icon color="primary" slot="start" name="log-out" size="large"></ion-icon>
+      <ion-label>Cerrar sesión</ion-label>
+    </ion-item>
+  </ion-list>
+  
+</ion-content>
+
+

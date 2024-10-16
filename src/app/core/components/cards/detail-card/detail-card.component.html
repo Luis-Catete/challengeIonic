@@ -1,0 +1,109 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title class="title">{{ item.name || item.episode }}</ion-title>
+    <ion-buttons slot="start">
+      <ion-button color="secondary" (click)="cancel()">
+        <ion-icon slot="start" name="arrow-back-outline"></ion-icon>Volver
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="item">
+  <!-- Imagen del personaje -->
+  <ion-card *ngIf="item.image">
+    <ion-card-content>
+      <ion-img [src]="item.image" alt="{{ item.name }}"></ion-img>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Información del personaje -->
+  <ion-card *ngIf="item.gender">
+    <ion-card-header>
+      <ion-card-title>{{ item.name }}</ion-card-title>
+      <ion-card-subtitle>{{ item.species }} - {{ item.status }}</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p><strong>Género:</strong> {{ item.gender }}</p>
+      <p><strong>Especie:</strong> {{ item.species }}</p>
+      <p><strong>Estado:</strong> {{ item.status }}</p>
+      <p><strong>Tipo:</strong> {{ item.type || 'No especificado' }}</p>
+      <p><strong>Origen:</strong> {{ item.origin?.name }}</p>
+      <p><strong>Locación actual:</strong> {{ item.location?.name }}</p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Episodios en los que aparece (solo para personajes) -->
+  <ion-accordion-group expand="inset" *ngIf="item.episode?.length && category === 'Personajes'">
+    <ion-accordion>
+      <ion-item slot="header" color="rose">
+        <ion-label>Episodios donde aparece</ion-label>
+      </ion-item>
+      <div class="ion-padding" slot="content">
+        <div *ngIf="episodes.length">
+          <div *ngFor="let episode of episodes">
+            <app-info-card [item]="episode" category="Episodios"></app-info-card>
+          </div>
+        </div>
+      </div>
+    </ion-accordion>
+  </ion-accordion-group>
+
+  <!-- Información del episodio -->
+  <div *ngIf="category === 'Episodios'">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ item.name }}</ion-card-title>
+        <ion-card-subtitle>Emisión al Aire: {{ item.air_date }}</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <p><strong>Episodio:</strong> {{ item.episode }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Mostrar personajes del episodio usando el componente info-card -->
+    <ion-accordion-group expand="inset">
+      <ion-accordion>
+        <ion-item slot="header" color="rose">
+          <ion-label>Personajes que aparecen</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          <div *ngIf="characters.length">
+            <div *ngFor="let character of characters">
+              <app-info-card [item]="character" category="Personajes"></app-info-card>
+            </div>
+          </div>
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
+  </div>
+
+  
+  <!-- Mostrar información de la locación -->
+  <div *ngIf="category === 'Locaciones'">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ item.name }}</ion-card-title>
+        <ion-card-subtitle>{{ item.type }}</ion-card-subtitle>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <p><strong>Dimensión:</strong> {{ item.dimension }}</p>
+        <p><strong>Creado:</strong> {{ item.created | date }}</p>
+        <p><strong>Residentes:</strong>{{characters.length}}</p>
+
+        <br>
+        <h4 class="personajes-titulo ">Residentes</h4>
+        
+        <div *ngIf="characters.length">
+          <div *ngFor="let character of characters">
+            <app-info-card [item]="character" category="Personajes"></app-info-card>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+</ion-content>

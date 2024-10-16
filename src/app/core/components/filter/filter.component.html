@@ -10,12 +10,17 @@
 
 <ion-item *ngIf="selectedCategory === 'Episodios'"> 
   <ion-label>Fecha</ion-label>
-  <ion-datetime displayFormat="YYYY-MM-DD" (ionChange)="onDateChange($event)"></ion-datetime>
+  <ion-datetime displayFormat="YYYY-MM-DD" (ionChange)="onDateChange($event)" presentation="date"></ion-datetime>
 </ion-item>
 
 <ion-item>
-  <ion-label>Buscar</ion-label>
-  <ion-input placeholder="Buscar..." (ionInput)="onSearchChange($event)" [value]="searchQuery"></ion-input>
+  <ion-input
+      label="Buscar "
+      [clearInput]="true"
+      placeholder="Buscar"
+      (ionInput)="onSearchChange($event)" 
+      [value]="searchQuery"
+    ></ion-input>
 </ion-item>
 
 
