@@ -115,10 +115,16 @@ export class RickAndMortyComponent implements OnInit {
         
               let filteredEpisodes = response.results;
         
-              // Lógica de filtro por fecha
-              if (this.selectedDate) {
-                // ... tu código de filtrado por fecha
-              }
+              // Aplicar el filtro de fecha para mostrar los episodios por fecha de emisión si estan disponibles
+          if (this.selectedDate) {
+            const selectedDateMoment = moment(this.selectedDate);
+
+            filteredEpisodes = filteredEpisodes.filter((episode: Episode) => {
+              const episodeAirDate = moment(episode.air_date, 'MMMM D, YYYY');
+              return episodeAirDate.isSame(selectedDateMoment, 'day'); //se 
+            });
+
+          }
         
               // Lógica de filtro de búsqueda
               if (this.searchQuery) {
