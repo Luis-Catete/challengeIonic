@@ -1,0 +1,48 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Rick and Morty</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <!-- Componente de filtros reutilizable -->
+  <app-filter 
+  [categories]="categories" 
+  [selectedCategory]="selectedCategory" 
+  [selectedDate]="selectedDate"
+  [searchQuery]="searchQuery"
+  (filterChange)="onFilterSelected($event)">
+</app-filter>
+
+  <div *ngIf="selectedCategory === 'Personajes'">
+    <div *ngFor="let character of characters">
+      <!--app-character-card 
+        [name]="character.name" 
+        [status]="character.status" 
+        [imageUrl]="character.image">
+      </app-character-card-->
+    </div>
+  </div>
+
+  <div *ngIf="selectedCategory === 'Episodios'">
+    <div *ngFor="let episode of episodes">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>{{ episode.name }}</ion-card-title>
+          <ion-card-subtitle>Aire: {{ episode.air_date }}</ion-card-subtitle>
+        </ion-card-header>
+      </ion-card>
+    </div>
+  </div>
+
+  <div *ngIf="selectedCategory === 'Locaciones'">
+    <div *ngFor="let location of locations">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>{{ location.name }}</ion-card-title>
+          <ion-card-subtitle>Tipo: {{ location.type }}</ion-card-subtitle>
+        </ion-card-header>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

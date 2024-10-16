@@ -1,0 +1,26 @@
+
+<ion-item>
+  <ion-label>Categoría</ion-label>
+  <ion-select [value]="selectedCategory" (ionChange)="onCategoryChange($event)">
+    <ion-select-option *ngFor="let category of categories" [value]="category">
+      {{ category | titlecase }}
+    </ion-select-option>
+  </ion-select>
+</ion-item>
+
+<ion-item *ngIf="selectedCategory === 'Episodios'"> 
+  <ion-label>Fecha</ion-label>
+  <ion-datetime displayFormat="YYYY-MM-DD" (ionChange)="onDateChange($event)"></ion-datetime>
+</ion-item>
+
+<ion-item>
+  <ion-label>Buscar</ion-label>
+  <ion-input placeholder="Buscar..." (ionInput)="onSearchChange($event)"></ion-input>
+</ion-item>
+
+
+<!-- Botón para aplicar filtros -->
+<ion-button expand="full" (click)="applyFilters()">Aplicar Filtros</ion-button>
+
+<!-- Botón para limpiar filtros -->
+<ion-button expand="full" color="light" (click)="clearFilters()">Limpiar Filtros</ion-button>
